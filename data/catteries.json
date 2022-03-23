@@ -1,12 +1,12 @@
 [
   {
     "id": "a193a6a7-42ab-4182-97dc-555ee85e7486",
-    "name": "Nordic Cattery",
+    "catteryName": "Nordic Cattery",
     "address": "988 Main Street",
     "city": "Vancouver",
     "country": "Canada",
     "breed": "Maine Coon",
-    "ticaregistered": "True",
+    "ticaRegistered": "True",
     "contact": {
       "name": "Mary Smith",
       "phone": "777-788-8910",
@@ -37,7 +37,7 @@
         "image_05": "https://imgur.com/"
       }
     ],
-    "document": [
+    "documents": [
       {
         "id": "c05b9a93-8682-4ab6-aff2-92ebb4bbfc14",
         "document_01": "https://imgur.com/"

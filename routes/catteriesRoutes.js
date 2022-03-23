@@ -12,4 +12,10 @@ router.get("/:id", catteriesController.getCatteryById);
 //Route to POST new cattery
 router.post("/", catteriesController.createNewCattery);
 
+//Route to edit a cattery
+router.put("/edit/:id", catteriesController.editCattery);
+
+//Route to delete a cattery
+router.delete("/:id", catteriesController.deleteCattery);
+
 module.exports = router;
