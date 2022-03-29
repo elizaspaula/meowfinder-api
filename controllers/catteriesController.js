@@ -17,7 +17,25 @@ const getCatteryById = (req, res) => {
   fs.readFile("./data/catteries.json", "utf8", (err, data) => {
     const catteriesData = JSON.parse(data);
     const foundCattery = catteriesData.find(
-      (cattery) => (cattery.id = req.params.id)
+      (cattery) => cattery.id === req.params.id
+    );
+    if (foundCattery) {
+      res.json(foundCattery);
+    } else {
+      console.log(err);
+      res.status(400).send("No cattery found with this id");
+    }
+  });
+};
+
+//Get a single cattery by prov and breed
+const getCatteryByBreedProvince = (req, res) => {
+  fs.readFile("./data/catteries.json", "utf8", (err, data) => {
+    const catteriesData = JSON.parse(data);
+    const foundCattery = catteriesData.filter(
+      (cattery) =>
+        cattery.breed === req.params.breed &&
+        cattery.province === req.params.province
     );
     if (foundCattery) {
       res.json(foundCattery);
@@ -35,43 +53,48 @@ const createNewCattery = (req, res) => {
     catteryName: req.body.catteryName,
     address: req.body.address,
     city: req.body.city,
-    country: req.body.city,
+    country: req.body.country,
+    province: req.body.province,
     breed: req.body.breed,
-    ticaRegistered: req.body.ticaRegistered,
-    contact: {
-      name: req.body.name,
-      phone: req.body.phone,
-      email: req.body.email,
-      website: req.body.website,
-      facebook: req.body.facebook,
-      instragram: req.body.instragram,
-    },
-    gallery: {
-      id: id.req.body.id,
-      image: req.body.image,
-    },
-    documents: {
-      id: id.body.id,
-      document: req.body.document,
-    },
-    comments: {
-      id: req.body.id,
-      name: req.body.name,
-      comment: req.body.comment,
-    },
+    // ticaRegistered: req.body.ticaRegistered,
+    name: req.body.name,
+    phone: req.body.phone,
+    email: req.body.email,
+    website: req.body.website,
+    facebook: req.body.facebook,
+    instragram: req.body.instragram,
+    // gallery: {
+    //   id: id.req.body.id,
+    //   image: req.body.image,
+    // },
+    // documents: {
+    //   id: id.body.id,
+    //   document: req.body.document,
+    // },
+    // comments: {
+    //   id: req.body.id,
+    //   name: req.body.name,
+    //   comment: req.body.comment,
+    // },
   };
 
-  fs.readFile(".data/catteries.json", "utf8", (err, data) => {
+  fs.readFile("./data/catteries.json", "utf8", (err, data) => {
     if (err) {
-      res.status(400).send("Error reading file");
+      console.error(err);
+      res.status(500).send(err);
     } else {
       const catteriesData = JSON.parse(data);
-      catteriesData.unshift(newCattery);
+      catteriesData.push(newCattery);
       fs.writeFile(
         "./data/catteries.json",
         JSON.stringify(catteriesData),
-        () => {
-          res.send("Cattery has been added");
+        (err, data) => {
+          if (err) {
+            console.error(err);
+            res.status(500).send(err);
+          } else {
+            res.status(200).send("Cattery has been added");
+          }
         }
       );
     }
@@ -134,4 +157,5 @@ module.exports = {
   createNewCattery,
   editCattery,
   deleteCattery,
+  getCatteryByBreedProvince,
 };
