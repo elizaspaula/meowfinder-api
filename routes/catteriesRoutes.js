@@ -12,13 +12,4 @@ router.get("/:id", catteriesController.getCatteryById);
 //Route to GET single cattery by breed and province
 router.get("/:breed/:province", catteriesController.getCatteryByBreedProvince);
 
-//Route to POST new cattery
-router.post("/", catteriesController.createNewCattery);
-
-//Route to PUT a cattery
-router.put("/edit/:id", catteriesController.editCattery);
-
-//Route to DELETE a cattery
-router.delete("/:id", catteriesController.deleteCattery);
-
 module.exports = router;
