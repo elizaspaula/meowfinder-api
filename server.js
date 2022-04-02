@@ -4,14 +4,24 @@ const catteriesRoutes = require("./routes/catteriesRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
+const fileUpload = require("express-fileupload");
+const morgan = require("morgan");
 require("dotenv").config(); // load .env variables
 const fs = require("fs");
+const path = require("path");
 const PORT = process.env.PORT || 5050;
 
 //Middleware
 app.use(express.json()); // add req.body
 app.use(cors()); // allow cross-origin resource sharing
-app.use(express.static("public")); // adds public folder for serving images
+app.use(express.static("./public")); // adds public folder for serving images
+app.use(
+  fileUpload({
+    createParentPath: true,
+  })
+);
+app.use(express.urlencoded({ extended: true }));
+app.use(morgan("dev"));
 
 //Public Route
 app.use("/catteries", catteriesRoutes);
@@ -99,9 +109,33 @@ app.post("/login", (req, res) => {
   });
 });
 
-app.get("/profile", (req, res) => {
-  res.json(req.decode);
-});
+// app.get("/profile", (req, res) => {
+//   res.json(req.decode);
+// });
+
+// -- express--file upload
+
+// app.post("/picture", async (req, res) => {
+//   try {
+//     if (!req.files) {
+//       res.send({
+//         status: false,
+//         message: "No files",
+//       });
+//     } else {
+//       const { picture } = req.files;
+
+//       picture.mv("./public/uploads/" + picture.name);
+
+//       res.send({
+//         status: true,
+//         message: "File is uploaded",
+//       });
+//     }
+//   } catch (e) {
+//     res.status(500).send(e);
+//   }
+// });
 
 // Listening
 app.listen(PORT, () => {

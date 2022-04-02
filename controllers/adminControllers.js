@@ -1,8 +1,10 @@
+const { v4: uuidv4 } = require("uuid");
 const fs = require("fs");
+
 //Create a new cattery
 const createNewCattery = (req, res) => {
   const newCattery = {
-    id: req.body.id,
+    id: uuidv4(),
     user: req.decode.email,
     catteryName: req.body.catteryName,
     address: req.body.address,
@@ -17,6 +19,8 @@ const createNewCattery = (req, res) => {
     website: req.body.website,
     facebook: req.body.facebook,
     instragram: req.body.instragram,
+    picture: [],
+    document: [],
     // gallery: {
     //   id: id.req.body.id,
     //   image: req.body.image,
@@ -31,6 +35,20 @@ const createNewCattery = (req, res) => {
     //   comment: req.body.comment,
     // },
   };
+
+  if (req.files) {
+    const { picture, document } = req.files;
+
+    picture.forEach((element) => {
+      element.mv("./public/uploads/" + element.name);
+      newCattery.picture.push(element.name);
+    });
+
+    document.forEach((element) => {
+      element.mv("./public/uploads/" + element.name);
+      newCattery.document.push(element.name);
+    });
+  }
 
   fs.readFile("./data/catteries.json", "utf8", (err, data) => {
     if (err) {
