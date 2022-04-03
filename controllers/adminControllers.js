@@ -7,12 +7,14 @@ const createNewCattery = (req, res) => {
     id: uuidv4(),
     user: req.decode.email,
     catteryName: req.body.catteryName,
+    description: req.body.description,
+    descriptionmobile: req.body.descriptionmobile,
     address: req.body.address,
     city: req.body.city,
     country: req.body.country,
     province: req.body.province,
     breed: req.body.breed,
-    // ticaRegistered: req.body.ticaRegistered,
+    registry: req.body.registry,
     name: req.body.name,
     phone: req.body.phone,
     email: req.body.email,
@@ -20,34 +22,23 @@ const createNewCattery = (req, res) => {
     facebook: req.body.facebook,
     instragram: req.body.instragram,
     picture: [],
-    document: [],
-    // gallery: {
-    //   id: id.req.body.id,
-    //   image: req.body.image,
-    // },
-    // documents: {
-    //   id: id.body.id,
-    //   document: req.body.document,
-    // },
-    // comments: {
-    //   id: req.body.id,
-    //   name: req.body.name,
-    //   comment: req.body.comment,
-    // },
+    document: null,
   };
 
   if (req.files) {
     const { picture, document } = req.files;
 
-    picture.forEach((element) => {
-      element.mv("./public/uploads/" + element.name);
-      newCattery.picture.push(element.name);
-    });
+    if (picture) {
+      picture.forEach((element) => {
+        element.mv("./public/uploads/" + element.name);
+        newCattery.picture.push(element.name);
+      });
+    }
 
-    document.forEach((element) => {
-      element.mv("./public/uploads/" + element.name);
-      newCattery.document.push(element.name);
-    });
+    if (document) {
+      document?.mv("./public/uploads/" + document.name);
+      newCattery.document = document.name;
+    }
   }
 
   fs.readFile("./data/catteries.json", "utf8", (err, data) => {
@@ -93,14 +84,29 @@ const editCattery = (req, res) => {
         catteryData[id]["country"] = req.body.country;
         catteryData[id]["province"] = req.body.province;
         catteryData[id]["description"] = req.body.description;
+        catteryData[id]["descriptionmobile"] = req.body.descriptionmobile;
         catteryData[id]["breed"] = req.body.breed;
-        catteryData[id]["ticaRegistered"] = req.body.ticaRegistered;
+        catteryData[id]["registry"] = req.body.registry;
         catteryData[id]["name"] = req.body.name;
         catteryData[id]["email"] = req.body.email;
         catteryData[id]["phone"] = req.body.phone;
         catteryData[id]["website"] = req.body.website;
         catteryData[id]["facebook"] = req.body.facebook;
         catteryData[id]["instagram"] = req.body.instagram;
+
+        if (req.files) {
+          const { picture, document } = req.files;
+
+          picture.forEach((element) => {
+            element.mv("./public/uploads/" + element.name);
+            catteryData[id].picture.push(element.name);
+          });
+
+          if (document) {
+            document.mv("./public/uploads/" + document.name);
+            catteryData[id].document.push(document.name);
+          }
+        }
 
         fs.writeFile(
           "./data/catteries.json",
