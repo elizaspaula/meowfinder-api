@@ -11,7 +11,6 @@ const catteriesSchema = new mongoose.Schema({
   user: String,
   catteryName: String,
   description: String,
-  descriptionmobile: String,
   address: String,
   city: String,
   country: String,
