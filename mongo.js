@@ -34,6 +34,7 @@ const usersSchema = new mongoose.Schema({
   password: String,
 });
 
+/// user config
 const Users = mongoose.model("Users", usersSchema);
 
 module.exports = {
