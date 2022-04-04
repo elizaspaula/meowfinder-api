@@ -8,6 +8,7 @@ const fileUpload = require("express-fileupload");
 const morgan = require("morgan");
 require("dotenv").config(); // load .env variables
 const fs = require("fs");
+const { connect, Users } = require("./mongo");
 const path = require("path");
 const PORT = process.env.PORT || 5050;
 
@@ -60,82 +61,41 @@ function getToken(req) {
 }
 
 app.post("/signup", (req, res) => {
-  const newUser = {
+  const newUser = new Users({
     email: req.body.email,
     password: req.body.password,
-  };
-
-  fs.readFile("./data/user.json", "utf8", (err, data) => {
-    if (err) {
-      console.error(err);
-      res.status(500).send(err);
-    } else {
-      const userData = JSON.parse(data);
-      userData.push(newUser);
-      fs.writeFile(
-        "./data/user.json",
-        JSON.stringify(userData),
-        (err, data) => {
-          if (err) {
-            console.error(err);
-            res.status(500).send(err);
-          } else {
-            res.status(200).send("User has been added");
-          }
-        }
-      );
-    }
   });
+
+  connect().then(() =>
+    newUser.save((err) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send(err);
+      } else {
+        res.status(200).send("Users has been added");
+      }
+    })
+  );
 });
 
 app.post("/login", (req, res) => {
-  fs.readFile("./data/user.json", "utf8", (err, data) => {
-    const userData = JSON.parse(data);
-    const foundUser = userData.find(
-      (user) =>
-        user.email === req.body.email && user.password === req.body.password
-    );
-    if (foundUser) {
+  connect().then(async () => {
+    try {
+      const foundUser = await Users.find({
+        user: req.body.email,
+        password: req.body.password,
+      }).exec();
       res.json({
         token: jwt.sign(
           { email: foundUser.email },
           process.env.ACCESS_TOKEN_SECRET
         ),
       });
-    } else {
-      console.log(err);
+    } catch (err) {
       res.status(400).send("No user was found with this email or password");
     }
   });
 });
-
-// app.get("/profile", (req, res) => {
-//   res.json(req.decode);
-// });
-
-// -- express--file upload
-
-// app.post("/picture", async (req, res) => {
-//   try {
-//     if (!req.files) {
-//       res.send({
-//         status: false,
-//         message: "No files",
-//       });
-//     } else {
-//       const { picture } = req.files;
-
-//       picture.mv("./public/uploads/" + picture.name);
-
-//       res.send({
-//         status: true,
-//         message: "File is uploaded",
-//       });
-//     }
-//   } catch (e) {
-//     res.status(500).send(e);
-//   }
-// });
 
 // Listening
 app.listen(PORT, () => {

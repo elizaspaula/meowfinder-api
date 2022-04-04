@@ -1,9 +1,9 @@
 const { v4: uuidv4 } = require("uuid");
-const fs = require("fs");
+const { connect, Catteries } = require("../mongo");
 
 //Create a new cattery
 const createNewCattery = (req, res) => {
-  const newCattery = {
+  const newCattery = new Catteries({
     id: uuidv4(),
     user: req.decode.email,
     catteryName: req.body.catteryName,
@@ -23,7 +23,7 @@ const createNewCattery = (req, res) => {
     instragram: req.body.instragram,
     picture: [],
     document: null,
-  };
+  });
 
   if (req.files) {
     const { picture, document } = req.files;
@@ -41,120 +41,95 @@ const createNewCattery = (req, res) => {
     }
   }
 
-  fs.readFile("./data/catteries.json", "utf8", (err, data) => {
-    if (err) {
-      console.error(err);
-      res.status(500).send(err);
-    } else {
-      const catteriesData = JSON.parse(data);
-      catteriesData.push(newCattery);
-      fs.writeFile(
-        "./data/catteries.json",
-        JSON.stringify(catteriesData),
-        (err, data) => {
-          if (err) {
-            console.error(err);
-            res.status(500).send(err);
-          } else {
-            res.status(200).send("Cattery has been added");
-          }
-        }
-      );
-    }
-  });
+  connect().then(() =>
+    newCattery.save((err) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send(err);
+      } else {
+        res.status(200).send("Cattery has been added");
+      }
+    })
+  );
 };
 
 //Edit one cattery
+
 const editCattery = (req, res) => {
-  fs.readFile("./data/catteries.json", "utf8", (err, data) => {
-    if (err) {
-      console.error(err);
-      res.status(500).send(err);
-    } else {
-      const catteryData = JSON.parse(data);
-      const id = catteryData.findIndex(
-        (cattery) =>
-          cattery.id === req.params.id && cattery.user === req.decode.email
-      );
+  const editNewCattery = {
+    user: req.decode.email,
+    catteryName: req.body.catteryName,
+    description: req.body.description,
+    descriptionmobile: req.body.descriptionmobile,
+    address: req.body.address,
+    city: req.body.city,
+    country: req.body.country,
+    province: req.body.province,
+    breed: req.body.breed,
+    registry: req.body.registry,
+    name: req.body.name,
+    phone: req.body.phone,
+    email: req.body.email,
+    website: req.body.website,
+    facebook: req.body.facebook,
+    instragram: req.body.instragram,
+    picture: [],
+    document: null,
+  };
+  if (req.files) {
+    const { picture, document } = req.files;
 
-      if (id >= 0) {
-        catteryData[id]["catteryName"] = req.body.catteryName;
-        catteryData[id]["address"] = req.body.address;
-        catteryData[id]["city"] = req.body.city;
-        catteryData[id]["country"] = req.body.country;
-        catteryData[id]["province"] = req.body.province;
-        catteryData[id]["description"] = req.body.description;
-        catteryData[id]["descriptionmobile"] = req.body.descriptionmobile;
-        catteryData[id]["breed"] = req.body.breed;
-        catteryData[id]["registry"] = req.body.registry;
-        catteryData[id]["name"] = req.body.name;
-        catteryData[id]["email"] = req.body.email;
-        catteryData[id]["phone"] = req.body.phone;
-        catteryData[id]["website"] = req.body.website;
-        catteryData[id]["facebook"] = req.body.facebook;
-        catteryData[id]["instagram"] = req.body.instagram;
+    picture.forEach((element) => {
+      element.mv("./public/uploads/" + element.name);
+      editNewCattery.picture.push(element.name);
+    });
 
-        if (req.files) {
-          const { picture, document } = req.files;
+    if (document) {
+      document.mv("./public/uploads/" + document.name);
+      editNewCattery.document = document.name;
+    }
+  }
 
-          picture.forEach((element) => {
-            element.mv("./public/uploads/" + element.name);
-            catteryData[id].picture.push(element.name);
-          });
-
-          if (document) {
-            document.mv("./public/uploads/" + document.name);
-            catteryData[id].document.push(document.name);
-          }
-        }
-
-        fs.writeFile(
-          "./data/catteries.json",
-          JSON.stringify(catteryData),
-          () => {
-            res.send("Cattery has been update");
-          }
-        );
-      } else {
-        res.status(404).send("This cattery doesn't exist in the database");
-      }
+  connect().then(async () => {
+    try {
+      const catteriesData = await Catteries.updateOne(
+        {
+          id: req.params.id,
+          user: req.decode.email,
+        },
+        editNewCattery
+      ).exec();
+      res.json(catteriesData);
+    } catch (err) {
+      res.status(400).send("No cattery found with this id");
     }
   });
 };
 
 //Delete one cattery
 const deleteCattery = (req, res) => {
-  fs.readFile("./data/catteries.json", "utf8", (err, data) => {
-    if (err) {
-      console.log;
-      res.status(400).send("Error reading file");
-    } else {
-      const catteriesData = JSON.parse(data);
-      const updateCatteryData = catteriesData.filter((cattery) => {
-        return cattery.id !== req.params.id;
-      });
-      fs.writeFile(
-        "./data/catteries.json",
-        JSON.stringify(updateCatteryData),
-        () => {
-          res.json(updateCatteryData);
-        }
-      );
+  connect().then(async () => {
+    try {
+      const catteriesData = await Catteries.deleteOne({
+        id: req.params.id,
+        user: req.decode.email,
+      }).exec();
+      res.json(catteriesData);
+    } catch (err) {
+      res.status(400).send("No cattery found with this id");
     }
   });
 };
 
-// GET Single Cattery by User
+// GET  Catteries by User
 const getCatteryByUser = (req, res) => {
-  fs.readFile("./data/catteries.json", "utf8", (err, data) => {
-    const catteriesData = JSON.parse(data);
-    const foundCattery = catteriesData.filter(
-      (cattery) => cattery.user === req.decode.email
-    );
-    if (foundCattery) {
-      res.json(foundCattery);
-    } else {
-      console.log(err);
+  connect().then(async () => {
+    try {
+      const catteriesData = await Catteries.find({
+        user: req.decode.email,
+      }).exec();
+      res.json(catteriesData);
+    } catch (err) {
       res.status(400).send("No cattery found with this id");
     }
   });
