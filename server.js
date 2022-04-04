@@ -27,32 +27,32 @@ app.use(morgan("dev"));
 //Public Route
 app.use("/catteries", catteriesRoutes);
 
-//Private Route
-app.use((req, res, next) => {
-  // Signup and login are public URLs that don't require a token
-  if (req.url === "/signup" || req.url === "/login") {
-    next();
-  } else {
-    // Format of request is BEARER <token>. Splitting on ' ' will create an
-    // array where the token is at index 1
-    const token = getToken(req);
+// //Private Route
+// app.use((req, res, next) => {
+//   // Signup and login are public URLs that don't require a token
+//   if (req.url === "/signup" || req.url === "/login") {
+//     next();
+//   } else {
+//     // Format of request is BEARER <token>. Splitting on ' ' will create an
+//     // array where the token is at index 1
+//     const token = getToken(req);
 
-    if (token) {
-      // console.log("Auth Token:", token);
+//     if (token) {
+//       // console.log("Auth Token:", token);
 
-      if (jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)) {
-        // Decode the token to pass along to end-points that may need
-        // access to data stored in the token.
-        req.decode = jwt.decode(token);
-        next();
-      } else {
-        res.status(403).json({ error: "Not Authorized." });
-      }
-    } else {
-      res.status(403).json({ error: "No token. Unauthorized." });
-    }
-  }
-});
+//       if (jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)) {
+//         // Decode the token to pass along to end-points that may need
+//         // access to data stored in the token.
+//         req.decode = jwt.decode(token);
+//         next();
+//       } else {
+//         res.status(403).json({ error: "Not Authorized." });
+//       }
+//     } else {
+//       res.status(403).json({ error: "No token. Unauthorized." });
+//     }
+//   }
+// });
 
 app.use("/admin", adminRoutes);
 
