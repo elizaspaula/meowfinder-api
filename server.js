@@ -24,10 +24,6 @@ app.use(
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
-// //Heroku setup
-// if (process.env.NODE_ENV === "production") {
-// }
-
 //Public Route
 app.use("/catteries", catteriesRoutes);
 
