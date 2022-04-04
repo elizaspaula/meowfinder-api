@@ -12,7 +12,7 @@ router.put("/cattery/:id", adminController.editCattery);
 //Route to DELETE a cattery
 router.delete("/cattery/:id", adminController.deleteCattery);
 
-//Route to GET Single Cattery by
+//Route to GET Single Cattery by User
 router.get("/", adminController.getCatteryByUser);
 
 module.exports = router;
