@@ -44,6 +44,7 @@ app.use((req, res, next) => {
         // Decode the token to pass along to end-points that may need
         // access to data stored in the token.
         req.decode = jwt.decode(token);
+        // console.log(req.decode);
         next();
       } else {
         res.status(403).json({ error: "Not Authorized." });
@@ -81,10 +82,11 @@ app.post("/signup", (req, res) => {
 app.post("/login", (req, res) => {
   connect().then(async () => {
     try {
-      const foundUser = await Users.find({
-        email: req.body.email, //  update from user to email
+      const foundUser = await Users.findOne({
+        email: req.body.email,
         password: req.body.password,
       }).exec();
+      // console.log(foundUser);
       res.json({
         token: jwt.sign(
           { email: foundUser.email },
