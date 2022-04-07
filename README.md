@@ -25,7 +25,7 @@
     
  Go to the project directory
  
-    cd meowfinder
+    cd meowfinder-api
   
   
   Install dependencies
