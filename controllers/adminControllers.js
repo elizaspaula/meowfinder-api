@@ -1,7 +1,7 @@
 const { v4: uuidv4 } = require("uuid");
 const { connect, Catteries } = require("../mongo");
 
-//Create a new cattery
+//Route to create a new cattery
 const createNewCattery = (req, res) => {
   const newCattery = new Catteries({
     id: uuidv4(),
@@ -52,8 +52,7 @@ const createNewCattery = (req, res) => {
   );
 };
 
-//Edit one cattery
-
+//Route to edit one cattery
 const editCattery = (req, res) => {
   const editNewCattery = {
     user: req.decode.email,
@@ -104,7 +103,7 @@ const editCattery = (req, res) => {
   });
 };
 
-//Delete one cattery
+//Route to delete one cattery
 const deleteCattery = (req, res) => {
   connect().then(async () => {
     try {
@@ -119,7 +118,7 @@ const deleteCattery = (req, res) => {
   });
 };
 
-// GET  Catteries by User
+// Route to get Catteries by User
 const getCatteryByUser = (req, res) => {
   connect().then(async () => {
     try {

@@ -38,13 +38,11 @@ app.use((req, res, next) => {
     const token = getToken(req);
 
     if (token) {
-      // console.log("Auth Token:", token);
-
       if (jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)) {
         // Decode the token to pass along to end-points that may need
         // access to data stored in the token.
         req.decode = jwt.decode(token);
-        // console.log(req.decode);
+
         next();
       } else {
         res.status(403).json({ error: "Not Authorized." });
@@ -86,7 +84,7 @@ app.post("/login", (req, res) => {
         email: req.body.email,
         password: req.body.password,
       }).exec();
-      // console.log(foundUser);
+
       res.json({
         token: jwt.sign(
           { email: foundUser.email },
